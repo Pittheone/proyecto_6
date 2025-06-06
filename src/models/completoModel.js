@@ -15,7 +15,8 @@ const completoSchema = mongoose.Schema({
         required: true,
     },
     customization: {
-        type: String
+        type: String,
+        required: false
     }
 }, {
     timestamps: true,

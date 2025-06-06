@@ -2,7 +2,7 @@ const Completo = require("../models/completoModel");
 const express = require('express');
 const app = express();
 
-const readAllCompletos =  async (req, res) => {
+exports.readAllCompletos =  async (req, res) => {
     try {
         const completo = await Completo.find();
         res.status(200).json(completo);
@@ -11,7 +11,7 @@ const readAllCompletos =  async (req, res) => {
     }
 };
 
-const readOneCompleto =  async (req, res) => {
+exports.readOneCompleto =  async (req, res) => {
     try {
         const completo = await Completo.findById(req.params.id);
         if (!completo) {
@@ -23,7 +23,7 @@ const readOneCompleto =  async (req, res) => {
     }
 };
 
-const createCompleto =  async (req, res) => {
+exports.createCompleto =  async (req, res) => {
   const { name, price, shippingAdress, customization } = req.body;
   try {
     const newCompleto = await Completo.create({
@@ -41,7 +41,7 @@ const createCompleto =  async (req, res) => {
   }
 };
 
-const updateCompleto =  async (req, res) => {
+exports.updateCompleto =  async (req, res) => {
   const { name, price, shippingAdress, customization } = req.body;
   try {
     const updatedCompleto = await Completo.findByIdAndUpdate(
@@ -63,7 +63,7 @@ const updateCompleto =  async (req, res) => {
   }
 };
 
-const deleteCompleto = async (req, res) => {
+exports.deleteCompleto = async (req, res) => {
   try {
     const deletedCompleto = await Completo.findByIdAndDelete(req.params.id);
     if (!deletedCompleto) {
@@ -78,11 +78,4 @@ const deleteCompleto = async (req, res) => {
   }
 };
 
-module.exports = {
-    createCompleto,
-    readAllCompletos,
-    readOneCompleto,
-    updateCompleto,
-    deleteCompleto
-};
 
