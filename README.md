@@ -61,14 +61,6 @@ proyecto_6/
 * package-lock.json: Archivo que asegura la consistencia de las versiones de las dependencias.
 * .gitignore: Lista de archivos y carpetas que Git debe ignorar.
 
-## Contribuciones
-
-Las contribuciones son bienvenidas. Por favor, sigue los siguientes pasos:
-
-1. Haz un fork del repositorio.
-2. Crea una nueva rama (git checkout -b feature/nueva-funcionalidad).
-3. Realiza tus cambios y haz commits descriptivos.
-4. Envía un pull request detallando los cambios realizados.
 
 ## Licencia
 
