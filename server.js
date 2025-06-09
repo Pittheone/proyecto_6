@@ -13,9 +13,7 @@ app.use(express.json());
 
 app.use('/api/users', userRoutes);
 app.use('/api/completo', completoRoutes);
-// app.use('/', (req, res) => {
-//     res.send('API is running...');
-//     });
+
 connectDB();
 
 const PORT = process.env.PORT || 5000;

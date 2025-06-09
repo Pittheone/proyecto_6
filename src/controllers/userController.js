@@ -19,18 +19,6 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-// exports.loginUser = async (req, res) => {
-//   const { email, password } = req.body;
-//   try {
-//     const user = await User.findOne({ email });
-//     if (!user || !(await user.comparePassword(password))) {
-//       return res.status(400).json({ message: 'Credenciales inválidas' });
-//     }
-//     res.status(200).json({ id: user._id, token: generateToken(user._id) });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
 exports.loginUser = async (req, res) => {
     const { email, password } = req.body;

@@ -74,6 +74,11 @@ Las contribuciones son bienvenidas. Por favor, sigue los siguientes pasos:
 
 Este proyecto está licenciado bajo la Licencia MIT.
 
+## Public Networking : 
+
+
+proyecto6-production-d227.up.railway.app
+
 
 
 
