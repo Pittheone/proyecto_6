@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const Cart = require('../models/cart.model');
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 
@@ -13,6 +14,7 @@ exports.registerUser = async (req, res) => {
     if (userExists) return res.status(400).json({ message: 'Usuario ya existe' });
 
     const user = await User.create({ name, email, password: await bcryptjs.hash(password, 10) });
+    const newCart = await Cart.create({ user: user._id });
     res.status(201).json({ id: user._id, token: generateToken(user._id) });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -35,18 +37,22 @@ exports.loginUser = async (req, res) => {
         jwt.sign(
             payload,
             process.env.JWT_SECRET,
-            { expiresIn: '30m' },
+            { expiresIn: '1d' },
             (error, token) => {
-                if (error) {
-                    return res.status(500).json({
-                        msg: 'Error al generar el token',
-                        error: error.message
-                    })
-                }
-                return res.json( token );
+                if (error) throw error
+                const isProd = process.env.NODE_ENV === 'production';
+                res
+                  .cookie('token', token, {
+                    httpOnly: true,
+                    secure: isProd, 
+                    sameSite: isProd ? 'None' : 'Lax', // 'None' for cross-site cookies in production
+                    maxAge: 24 * 60 * 60 * 1000 // 30 minutes
+                  })
+                  .json({ message: 'Inicio de sesión exitoso' });
             }
         );
     } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 }
 
@@ -73,3 +79,31 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+// exports.updateUser = async (req, res) => {
+//   const newDataForOurUser = req.body;
+//   try {
+//     const updatedUser = await User.findByIdAndUpdate(
+//       req.user.id,
+//       newDataForOurUser,
+//       { new: true }
+//     ).select("-password");
+//     res.json({
+//       msg: "Usuario actualizado con éxito.",
+//       data: updatedUser,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({
+//       msg: "Hubo un error actualizando el usuario.",
+//     });
+//   }
+// };
+
+exports.logout = (req, res) => {
+res.clearCookie('token', {
+httpOnly: true,
+secure: process.env.NODE_ENV === 'production',
+sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'
+})
+return res.json({ msg: 'Logout sucessful' });
+}

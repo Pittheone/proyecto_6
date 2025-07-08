@@ -14,6 +14,15 @@ const userSchema = mongoose.Schema(
             type: String,
             required: true,
         },
+        adress: {
+            type: String,
+            default: '',
+        },
+        cart: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Cart',
+            default: []
+        }
     },
     {
         timestamps: true,

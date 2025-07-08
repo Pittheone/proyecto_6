@@ -1,4 +1,5 @@
 const Completo = require("../models/completoModel");
+const stripe = require("stripe")(process.env.STRIPE_KEY);
 const express = require('express');
 const app = express();
 
@@ -24,14 +25,51 @@ exports.readOneCompleto =  async (req, res) => {
 };
 
 exports.createCompleto =  async (req, res) => {
-  const { name, price, shippingAdress, customization } = req.body;
+  const { name, price, shippingAdress, customization, description, img, currency, slug } = req.body;
   try {
-    const newCompleto = await Completo.create({
+    // const newCompleto = await Completo.create({
+    //   name,
+    //   price,
+    //   shippingAdress,
+    //   customization,
+    //   description,
+    //   img,
+    //   currency,
+    //   slug
+    // });
+    const product = await stripe.products.create({
       name,
-      price,
+      description,
       shippingAdress,
       customization,
-    });
+      images: [img],
+      metadata: {
+        productDescription: description,
+        slug
+      },
+    })
+
+  const newCompleto = await Completo.create({
+    idProd: product.id,
+    priceID: stripePrice.id,
+    name,
+    price, 
+    shippingAdress,
+    customization,
+    description,
+    img,
+    currency,
+    slug
+     });
+     
+     res.json(newCompleto );
+
+    const stripePrice = await stripe.prices.create({
+      unit_amount: price,
+      currency, 
+      product: product.id,
+    })
+
     return res.status(200).json({ newCompleto });
   } catch (error) {
     return res.status(500).json({
@@ -42,11 +80,11 @@ exports.createCompleto =  async (req, res) => {
 };
 
 exports.updateCompleto =  async (req, res) => {
-  const { name, price, shippingAdress, customization } = req.body;
+  const { name, price, shippingAdress, customization, description, img, currency, slug } = req.body;
   try {
     const updatedCompleto = await Completo.findByIdAndUpdate(
       req.params.id,
-      { name, price, shippingAdress, customization },
+      { name, price, shippingAdress, customization, description, img, currency, slug },
       { new: true, runValidators: true }
     );
     if (!updatedCompleto) {
