@@ -7,17 +7,41 @@ const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 };
 
+// exports.registerUser = async (req, res) => {
+//   const { name, email, password } = req.body;
+//   try {
+//     const userExists = await User.findOne({ email });
+//     if (userExists) return res.status(400).json({ message: 'Usuario ya existe' });
+
+//     const user = await User.create({ name, email, password: await bcryptjs.hash(password, 10) });
+//     const newCart = await Cart.create({ user: user._id });
+//     res.status(201).json({ id: user._id, token: generateToken(user._id) });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 exports.registerUser = async (req, res) => {
+    // obtener usuario, email y password de la petición
   const { name, email, password } = req.body;
   try {
-    const userExists = await User.findOne({ email });
-    if (userExists) return res.status(400).json({ message: 'Usuario ya existe' });
+    // Generemos un fragmento aleatorio para usarse con el password
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(password, salt);
+    const newCart = await Cart.create({});
 
-    const user = await User.create({ name, email, password: await bcryptjs.hash(password, 10) });
-    const newCart = await Cart.create({ user: user._id });
-    res.status(201).json({ id: user._id, token: generateToken(user._id) });
+    const respuestaDB = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      cart: newCart
+    });
+    // usuario creado
+    return res.json(respuestaDB);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(400).json({
+      msg: error,
+    });
   }
 };
 
@@ -60,22 +84,45 @@ exports.verifyToken = (req, res) => {
   res.json({ message: 'Token válido', user: req.user });
 };
 
-exports.updateUser = async (req, res) => {
-  const { name, email, password } = req.body;
-  const { id } = req.params;
-  try {
-    const user = await User.findById(id); 
-    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+// exports.updateUser = async (req, res) => {
+//   const { name, email, password } = req.body;
+//   const { id } = req.params;
+//   try {
+//     const user = await User.findById(id); 
+//     if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
 
     
-    if (name) user.name = name;
-    if (email) user.email = email;
-    if (password) user.password = await bcryptjs.hash(password, 10); 
+//     if (name) user.name = name;
+//     if (email) user.email = email;
+//     if (password) user.password = await bcryptjs.hash(password, 10); 
 
-    await user.save();
-    res.status(200).json({ message: 'Usuario actualizado exitosamente', user });
+//     await user.save();
+//     res.status(200).json({ message: 'Usuario actualizado exitosamente', user });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+exports.updateUser = async (req, res) => {
+  const newDataForOurUser = req.body;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      newDataForOurUser,
+      { new: true }
+    ).select("-password");
+
+    res.json({
+      msg: "Usuario actualizado con éxito.",
+      data: updatedUser,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log(error);
+
+    res.status(500).json({
+      msg: "Hubo un error actualizando el usuario.",
+    });
   }
 };
 
