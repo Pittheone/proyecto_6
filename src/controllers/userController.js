@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const Cart = require('../models/cart.model');
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
+const { get } = require('mongoose');
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1d' });
@@ -45,6 +46,30 @@ exports.registerUser = async (req, res) => {
   }
 };
 
+exports.getUserById = async (req, res) => {
+  const token = req.cookies?.["token"]; // ejemplo: "token"
+  
+
+  if (!token) {
+    return res.status(401).json({ message: 'No autorizado..' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.user.id); 
+
+
+    // Aquí podrías buscar al usuario en la DB con decoded.id
+    res.status(200).json({ user });
+
+  } catch (error) {
+    return res.status(403).json({ message: 'Token inválido' });
+  }
+};
+
+
+
 
 exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
@@ -72,7 +97,7 @@ exports.loginUser = async (req, res) => {
                     sameSite: isProd ? 'None' : 'Lax', // 'None' for cross-site cookies in production
                     maxAge: 24 * 60 * 60 * 1000 // 30 minutes
                   })
-                  .json({ message: 'Inicio de sesión exitoso' });
+                  .json({ message: 'Inicio de sesión exitoso', token });
             }
         );
     } catch (error) {

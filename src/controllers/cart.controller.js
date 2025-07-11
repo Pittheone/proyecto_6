@@ -42,6 +42,7 @@ exports.getCart = async (req, res) => {
 
 exports.editCart = async (req, res) => {
     const userID = req.user.id;
+    console.log("este es userID", userID);
     const foundUser = await User.findOne({ _id: userID });
     const { products } = req.body;
     const updatedCart = await Cart.findByIdAndUpdate(

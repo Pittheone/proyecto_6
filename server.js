@@ -18,7 +18,7 @@ connectDB();
 const app = express();
 const isProd = process.env.NODE_ENV === 'production';
 const allowedOrigins = isProd 
-? procces.env.FRONTEND_URL
+? process.env.FRONTEND_URL
 : process.env.FRONTEND_URL_DEV;
 app.use(
   cors({
