@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+
 
 const completoSchema = mongoose.Schema({
     idProd:{
@@ -24,12 +24,12 @@ const completoSchema = mongoose.Schema({
         required: true,
     },
     price: {
-        type: String,
+        type: Number,
         required: true,
     },
     shippingAdress: {
         type: String,
-        required: true,
+        required: false,
     },
     customization: {
         type: String,
@@ -41,7 +41,8 @@ const completoSchema = mongoose.Schema({
     },
     img: {
         type: String,
-        required: true
+        required: false,
+        default: null
     }
 }, {
     timestamps: true,

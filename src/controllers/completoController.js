@@ -27,26 +27,20 @@ exports.readOneCompleto =  async (req, res) => {
 exports.createCompleto =  async (req, res) => {
   const { name, price, shippingAdress, customization, description, img, currency, slug } = req.body;
   try {
-    // const newCompleto = await Completo.create({
-    //   name,
-    //   price,
-    //   shippingAdress,
-    //   customization,
-    //   description,
-    //   img,
-    //   currency,
-    //   slug
-    // });
     const product = await stripe.products.create({
       name,
       description,
-      shippingAdress,
-      customization,
       images: [img],
       metadata: {
         productDescription: description,
         slug
       },
+    })
+
+    const stripePrice = await stripe.prices.create({
+      unit_amount: price,
+      currency, 
+      product: product.id,
     })
 
   const newCompleto = await Completo.create({
@@ -60,15 +54,10 @@ exports.createCompleto =  async (req, res) => {
     img,
     currency,
     slug
-     });
-     
-     res.json(newCompleto );
+     }); 
 
-    const stripePrice = await stripe.prices.create({
-      unit_amount: price,
-      currency, 
-      product: product.id,
-    })
+    //  res.json(newCompleto );
+
 
     return res.status(200).json({ newCompleto });
   } catch (error) {

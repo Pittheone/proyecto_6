@@ -2,25 +2,13 @@ const User = require('../models/userModel');
 const Cart = require('../models/cart.model');
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
-const { get } = require('mongoose');
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-};
 
-// exports.registerUser = async (req, res) => {
-//   const { name, email, password } = req.body;
-//   try {
-//     const userExists = await User.findOne({ email });
-//     if (userExists) return res.status(400).json({ message: 'Usuario ya existe' });
-
-//     const user = await User.create({ name, email, password: await bcryptjs.hash(password, 10) });
-//     const newCart = await Cart.create({ user: user._id });
-//     res.status(201).json({ id: user._id, token: generateToken(user._id) });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
+// const generateToken = (id) => {
+//   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 // };
+
+
 
 exports.registerUser = async (req, res) => {
     // obtener usuario, email y password de la petición
@@ -43,28 +31,6 @@ exports.registerUser = async (req, res) => {
     return res.status(400).json({
       msg: error,
     });
-  }
-};
-
-exports.getUserById = async (req, res) => {
-  const token = req.cookies?.["token"]; // ejemplo: "token"
-  
-
-  if (!token) {
-    return res.status(401).json({ message: 'No autorizado..' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    const user = await User.findById(decoded.user.id); 
-
-
-    // Aquí podrías buscar al usuario en la DB con decoded.id
-    res.status(200).json({ user });
-
-  } catch (error) {
-    return res.status(403).json({ message: 'Token inválido' });
   }
 };
 
@@ -105,28 +71,19 @@ exports.loginUser = async (req, res) => {
     }
 }
 
-exports.verifyToken = (req, res) => {
-  res.json({ message: 'Token válido', user: req.user });
+exports.verifyToken = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    return res.json({user});
+  } catch (error) {
+    return res.status(500).json({
+      msg:"Error al validar usuario",
+      error
+    })
+  }
 };
 
-// exports.updateUser = async (req, res) => {
-//   const { name, email, password } = req.body;
-//   const { id } = req.params;
-//   try {
-//     const user = await User.findById(id); 
-//     if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
 
-    
-//     if (name) user.name = name;
-//     if (email) user.email = email;
-//     if (password) user.password = await bcryptjs.hash(password, 10); 
-
-//     await user.save();
-//     res.status(200).json({ message: 'Usuario actualizado exitosamente', user });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
 exports.updateUser = async (req, res) => {
   const newDataForOurUser = req.body;
