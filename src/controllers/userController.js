@@ -60,8 +60,8 @@ exports.loginUser = async (req, res) => {
                   .cookie('token', token, {
                     httpOnly: true,
                     secure: isProd, 
-                    sameSite: isProd ? 'None' : 'Lax', // 'None' for cross-site cookies in production
-                    maxAge: 24 * 60 * 60 * 1000 // 30 minutes
+                    sameSite: isProd ? 'None' : 'Lax', 
+                    maxAge: 24 * 60 * 60 * 1000 
                   })
                   .json({ message: 'Inicio de sesión exitoso', token });
             }
